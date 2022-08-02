@@ -1,7 +1,6 @@
 mod utils;
 use std::fmt;
 use wasm_bindgen::prelude::*;
-
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -35,7 +34,7 @@ pub struct Universe {
 
 impl Universe {
     fn get_index(&self, row:u32, column:u32)->usize{
-        (row*self.width+column) as usize
+        (row * self.width+column) as usize
     }
 
     fn live_neighbor_count(&self,row:u32,column:u32) ->u8 {
@@ -53,6 +52,17 @@ impl Universe {
             }
         }
         count
+    }
+
+    pub fn get_cells(&self) ->&[Cell] {
+        &self.cells
+    }
+
+    pub fn set_cells(&mut self, cells: &[(u32,u32)]) {
+        for (row,col) in cells.iter().clone() {
+            let idx = self.get_index(*row,*col);
+            self.cells[idx]=Cell::Alive;
+        }
     }
 }
 
@@ -81,8 +91,9 @@ impl Universe {
     }
 
     pub fn new() -> Universe {
+        utils::set_panic_hook();
         let width = 64;
-        let height = 64;
+        let height = 128;
         let cells = (0..width*height)
             .map(|i| {
                 if i %2==0 || i%7==0 {
@@ -102,6 +113,33 @@ impl Universe {
     pub fn render(&self) -> String {
         self.to_string()
     }
+
+    pub fn width(&self) ->u32 {
+        self.width
+    }
+
+    pub fn height(&self) ->u32 {
+        self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
+    }
+
+    pub fn set_width(&mut self, width:u32) {
+        self.width = width;
+        self.cells=(0..width*self.height).map(|_| Cell::Dead).collect()
+    }
+
+    pub fn set_height(&mut self, height:u32) {
+        self.height = height;
+        self.cells=(0..height*self.width).map(|_| Cell::Dead).collect()
+    }
+
+    pub fn toggle_cell(&mut self,row:u32,col:u32) {
+        let idx = self.get_index(row,col);
+        self.cells[idx].toggle();
+    }
 }
 
 impl fmt::Display for Universe {
@@ -114,5 +152,14 @@ impl fmt::Display for Universe {
             write!(f,"\n")?;
         }
         Ok(())
+    }
+}
+
+impl Cell {
+    fn toggle(&mut self) {
+        *self = match *self {
+            Cell::Dead => Cell::Alive,
+            Cell::Alive => Cell::Dead,
+        };
     }
 }

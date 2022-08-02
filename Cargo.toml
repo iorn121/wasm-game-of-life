@@ -1,5 +1,5 @@
 [package]
-name = "wasm-game-of-life"
+name = "wasm-game-of-life-iorn"
 version = "0.1.0"
 authors = ["iorn <wmt.tkn.121@gmail.com>"]
 edition = "2018"
@@ -31,4 +31,12 @@ wasm-bindgen-test = "0.3.13"
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.
-opt-level = "s"
+lto = true
+opt-level = "z"
+
+[dependencies.web-sys] # wasm-bindgen 経由で Web API を使うためのライブラリ
+version="0.3"
+features = [
+  'Window',
+  'console',
+]
