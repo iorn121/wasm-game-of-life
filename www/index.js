@@ -75,12 +75,12 @@ const isPaused = () => {
 };
 
 const play = () => {
-  playPauseButton.textContent = "⏸";
+  playPauseButton.textContent = "停止";
   renderLoop();
 };
 
 const pause = () => {
-  playPauseButton.textContent = "▶️";
+  playPauseButton.textContent = "再生";
   cancelAnimationFrame(animationId);
   animationId = null;
 };
